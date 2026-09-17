@@ -1,0 +1,23 @@
+# ESP-IDF generated files
+**/build/
+**/managed_components/
+**/sdkconfig
+**/sdkconfig.old
+
+# Print jobs may contain document contents, usernames and spooler metadata.
+*.prn
+
+# Local/legacy files that are not part of the ESP-IDF repository.
+/HP2300Print/
+/build/
+/diagnostics/
+/tools/
+/UsbTreeView_x64/
+/eim-gui-windows-x64.exe
+/status_led.c
+/status_led.h
+
+__pycache__/
+*.pyc
+.idea/
+.vscode/
