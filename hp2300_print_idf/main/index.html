@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mybips · 打印网关</title>
+<style>
+:root{--ink:#18252b;--muted:#65747a;--line:#cbd5d1;--paper:#f2f4ef;--card:#fffefa;--accent:#d55c35;--ok:#14664d;--warn:#a54a27}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 "Noto Sans SC","Microsoft YaHei",sans-serif}
+header{background:var(--ink);color:#faf9f3;padding:22px max(24px,calc((100vw - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px}
+.brand{font:700 26px/1.1 Georgia,serif;letter-spacing:-1px}.brand span{color:#f18a5c}.tag{font:11px/1.2 monospace;letter-spacing:.16em;text-transform:uppercase;color:#a7b7b9}
+main{max-width:1100px;margin:auto;padding:42px 24px 80px}.eyebrow{font:700 11px monospace;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
+h1{font:500 clamp(34px,5vw,56px)/1.15 Georgia,"Noto Serif SC",serif;margin:10px 0 12px;letter-spacing:-.03em}h2{font:600 22px/1.2 Georgia,"Noto Serif SC",serif;margin:0 0 18px}
+.intro{color:var(--muted);max-width:620px;margin:0 0 34px}.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,1fr);gap:20px}
+.card{background:var(--card);border:1px solid var(--line);box-shadow:8px 8px 0 #e2e8e0;padding:28px;margin-bottom:20px}.card-head{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font:12px monospace;white-space:nowrap}.pill.ok{color:var(--ok);border-color:#a6cab6;background:#e9f5ec}.pill.bad{color:var(--warn);border-color:#e2b5a7;background:#fff0e9}
+label{display:block;font-weight:600;font-size:13px;margin:15px 0 6px}input[type=password],input[type=file],input[type=text],input[type=number]{width:100%;border:1px solid #aab9b6;background:white;color:var(--ink);padding:12px;font:inherit;border-radius:0}input[type=file]{cursor:pointer;border-style:dashed;padding:22px}
+button{border:0;background:var(--ink);color:white;padding:12px 18px;font:700 13px monospace;letter-spacing:.05em;cursor:pointer;transition:transform .15s,background .15s}button:hover{background:var(--accent);transform:translateY(-2px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.secondary{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.small{font-size:12px;color:var(--muted)}.rule{border-top:1px solid var(--line);margin:22px 0}.metric{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:12px 0}.metric span:first-child{color:var(--muted)}.metric strong{font:600 13px monospace;text-align:right;overflow-wrap:anywhere}
+progress{width:100%;height:8px;appearance:none;border:0;background:#dfe7df;margin:14px 0 4px}progress::-webkit-progress-bar{background:#dfe7df}progress::-webkit-progress-value{background:var(--accent)}progress::-moz-progress-bar{background:var(--accent)}
+#notice{min-height:24px;color:var(--warn);margin-top:10px}.hidden{display:none!important}.foot{font:12px monospace;color:var(--muted);border-top:1px solid var(--line);padding-top:18px;margin-top:24px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}header{padding:18px 22px}main{padding:28px 18px 60px}.card{padding:22px;box-shadow:5px 5px 0 #e2e8e0}}
+</style>
+</head>
+<body><header><div class="brand">mybips<span>.</span>print</div><div class="tag">USB PRINT GATEWAY / LOCAL CONTROL</div></header>
+<main><div class="eyebrow">设备维护控制台</div><h1>上传文件，直接打印。</h1><p class="intro">仅上传目标打印机驱动生成的原始 PRN 文件。单次最多 2 MiB；文件完整接收后，会立即交给 USB 打印机。</p>
+<section id="login" class="card"><h2>管理员登录</h2><label for="password">管理密码</label><input id="password" type="password" autocomplete="current-password"><div class="actions"><button id="loginBtn">登录控制台</button></div><p class="small">首次登录使用初始密码后，请设置管理密码和本机热点。多台设备应使用不同的热点名称。</p></section>
+<section id="change" class="card hidden"><div class="eyebrow">FIRST RUN / 本机初始化</div><h2>设置管理密码与设备热点</h2><p class="small">更改完成前，打印功能保持锁定。保存后板子将重启，手机或电脑需用新 Wi-Fi 密码重新连接。</p><label for="oldPassword">当前管理密码</label><input id="oldPassword" type="password" autocomplete="current-password"><label for="newPassword">新管理密码（至少 8 位）</label><input id="newPassword" type="password" autocomplete="new-password"><label for="newPasswordConfirm">确认新管理密码</label><input id="newPasswordConfirm" type="password" autocomplete="new-password"><div class="rule"></div><label for="setupWifiSsid">此板热点名称</label><input id="setupWifiSsid" type="text" value="mybips.com" maxlength="32" autocomplete="off"><p class="small">建议带上场地或打印机编号，例如 mybips-A01；最多 32 字节。</p><label for="setupWifiPassword">此板 Wi-Fi 密码（8～63 位）</label><input id="setupWifiPassword" type="password" autocomplete="new-password"><label for="setupWifiConfirm">确认 Wi-Fi 密码</label><input id="setupWifiConfirm" type="password" autocomplete="new-password"><div class="actions"><button id="changeBtn">保存并切换热点</button></div></section>
+<section id="reconnect" class="card hidden"><div class="eyebrow">NETWORK CHANGED / 等待重连</div><h2>配置已保存</h2><p>请在设备的 Wi-Fi 列表连接 <strong id="reconnectSsid"></strong>，然后重新访问 <strong>http://192.168.188.1/</strong>，使用新管理密码登录。</p><p id="reconnectRestart" class="small"></p></section>
+<div id="dashboard" class="grid hidden"><div><section class="card"><div class="card-head"><div><div class="eyebrow">01 / PRINT</div><h2>发送 PRN 文件</h2></div><span id="printerPill" class="pill">检查中</span></div><p class="small">支持标准 USB Printer Class Protocol 1/2 接口测试。请只上传当前打印机对应驱动生成的 PRN；USB 接收完成不等于纸张机械出纸完成。</p><label for="jobId">作业号</label><input id="jobId" type="text" maxlength="64" pattern="[A-Za-z0-9_-]+"><label for="totalPages">总页数</label><input id="totalPages" type="number" min="1" max="999" value="1"><div class="metric"><span>当前页</span><strong id="pageNumber">1</strong></div><label for="file">选择当前页驱动生成的文件</label><input id="file" type="file" accept=".prn,application/octet-stream"><div class="metric"><span>文件大小</span><strong id="size">—</strong></div><div class="actions"><button id="printBtn" disabled>上传当前页</button><button id="refreshBtn" class="secondary">刷新状态</button><button id="cancelBtn" class="secondary" disabled>取消会话</button></div><progress id="progress" value="0" max="100"></progress><div id="printState" class="small">等待选择文件</div></section></div>
+<div><section class="card"><div class="eyebrow">02 / DEVICE</div><h2>连接状态</h2><div class="metric"><span>打印机 VID:PID</span><strong id="printerName">—</strong></div><div class="metric"><span>型号</span><strong id="productName">—</strong></div><div class="metric"><span>命令集</span><strong id="commandSets">—</strong></div><div class="metric"><span>端口状态</span><strong id="port">—</strong></div><div class="metric"><span>当前作业</span><strong id="job">—</strong></div><div class="metric"><span>USB 已发送</span><strong id="sent">—</strong></div><div class="rule"></div><div class="small">维护地址：192.168.188.1<br>日志接口：UART0 / 115200</div></section><section class="card"><div class="eyebrow">03 / WI-FI</div><h2>本机热点</h2><div class="metric"><span>当前名称</span><strong id="wifiSsid">—</strong></div><p class="small">仅在没有打印作业时修改。保存后设备重启，所有连接会断开。</p><label for="wifiName">新热点名称</label><input id="wifiName" type="text" maxlength="32" autocomplete="off"><label for="wifiPass">新 Wi-Fi 密码</label><input id="wifiPass" type="password" autocomplete="new-password"><label for="wifiPassConfirm">确认新 Wi-Fi 密码</label><input id="wifiPassConfirm" type="password" autocomplete="new-password"><div class="actions"><button id="wifiBtn" class="secondary">保存热点配置</button></div></section><section class="card"><div class="eyebrow">04 / ACCOUNT</div><h2>会话</h2><p class="small">离开设备时请退出控制台。</p><button id="logoutBtn" class="secondary">退出登录</button></section></div></div>
+<div id="notice" role="status" aria-live="polite"></div><p class="foot">mybips / local printer gateway · 请勿上传非目标打印机驱动生成的文件</p></main>
+<script>
+let token='',poller=null,sessionId='',uploading=false,polling=false,lastHeartbeat=0;
+const $=id=>document.getElementById(id);
+const hex=n=>Number(n||0).toString(16).padStart(4,'0');
+function show(id,on){$(id).classList.toggle('hidden',!on)}
+function notice(s){$('notice').textContent=s||''}
+function newJobId(){return 'job-'+Date.now()}
+function networkSaved(data){
+  token='';clearInterval(poller);show('change',false);show('dashboard',false);show('login',false);
+  $('reconnectSsid').textContent=data.wifi_ssid;
+  $('reconnectRestart').textContent=data.reboot_scheduled?
+    '设备约 2 秒后重启；新热点出现后重新连接。':
+    '自动重启未能安排，请手动给板子断电重启后连接新热点。';
+  show('reconnect',true);notice('请记下新热点名称与密码');
+}
+$('jobId').value=newJobId();
+async function api(path,method='GET',body){
+  const headers={};
+  if(token)headers.Authorization='Bearer '+token;
+  if(body)headers['Content-Type']='application/json';
+  const response=await fetch('/api/v1'+path,{method,headers,body:body?JSON.stringify(body):undefined});
+  const result=await response.json();
+  if(!response.ok||!result.ok)throw Error(result.error?.message||'请求失败');
+  return result.data;
+}
+async function status(){
+  if(!token||polling)return;
+  polling=true;
+  try{
+    const s=await api('/printer/status');
+    const info=await api('/printer/info');
+    $('printerName').textContent=s.connected?hex(s.vid)+':'+hex(s.pid):'未连接';
+    $('productName').textContent=info.identity?.product||info.ieee1284?.model||'未知';
+    $('commandSets').textContent=info.ieee1284?.command_sets?.join(', ')||'未知';
+    $('port').textContent=s.connected?'接口 '+s.interface_number+' / 协议 '+s.protocol+' / 状态 0x'+s.raw_port_status:'—';
+    $('job').textContent=s.state+' #'+s.job_id;
+    $('sent').textContent=s.sent+' / '+s.total+' B';
+    $('printerPill').textContent=s.ready?'可打印':'不可打印';
+    $('printerPill').className='pill '+(s.ready?'ok':'bad');
+    let canSubmit=true;
+    if(sessionId){
+      const current=await api('/print-sessions/'+sessionId);
+      $('pageNumber').textContent=current.next_page;
+      $('printState').textContent='第 '+current.current_page+' 页：'+current.page_state;
+      if(current.page_state==='failed_unknown')notice('打印结果不确定，请先检查打印机；不要重发这一页');
+      canSubmit=current.active&&['idle','usb_delivered','failed_before_usb'].includes(current.page_state);
+      $('cancelBtn').disabled=!current.active||uploading;
+      if(current.active&&Date.now()-lastHeartbeat>30000&&canSubmit){
+        await api('/print-sessions/'+sessionId+'/heartbeat','POST');
+        lastHeartbeat=Date.now();
+      }
+      if(!current.active){sessionId='';$('cancelBtn').disabled=true;$('jobId').value=newJobId();$('pageNumber').textContent='1'}
+    }else{
+      $('printState').textContent=s.error||'等待选择文件并创建打印会话';
+    }
+    if(s.total&&s.state==='sending_usb')$('progress').value=Math.round(s.sent/s.total*100);
+    const f=$('file').files[0];
+    $('printBtn').disabled=!s.ready||!f||f.size===0||f.size>2097152||uploading||!canSubmit||
+      s.state==='queued'||s.state==='sending_usb'||s.state==='failed_unknown';
+  }catch(e){notice(e.message)}
+  finally{polling=false}
+}
+$('file').onchange=()=>{
+  const f=$('file').files[0];
+  $('size').textContent=f?f.size.toLocaleString()+' B':'—';
+  if(f&&f.size>2097152)notice('文件超过 2 MiB 上限');
+  else notice('');
+  status();
+};
+$('loginBtn').onclick=async()=>{
+  try{
+    const data=await api('/auth/login','POST',{password:$('password').value});
+    token=data.access_token;
+    show('login',false);show('change',data.must_change_password);
+    show('dashboard',!data.must_change_password);notice('');
+    if(!data.must_change_password){
+      const wifi=await api('/device/wifi');
+      $('wifiSsid').textContent=wifi.wifi_ssid;
+      $('wifiName').value=wifi.wifi_ssid;
+      await status();poller=setInterval(status,1500);
+    }
+  }catch(e){notice(e.message)}
+};
+$('changeBtn').onclick=async()=>{
+  try{
+    if($('newPassword').value!==$('newPasswordConfirm').value)throw Error('两次输入的管理密码不一致');
+    if($('setupWifiPassword').value!==$('setupWifiConfirm').value)throw Error('两次输入的 Wi-Fi 密码不一致');
+    const data=await api('/auth/password','PUT',{
+      old_password:$('oldPassword').value,new_password:$('newPassword').value,
+      wifi_ssid:$('setupWifiSsid').value,wifi_password:$('setupWifiPassword').value
+    });
+    networkSaved(data);
+  }catch(e){notice(e.message)}
+};
+$('wifiBtn').onclick=async()=>{
+  try{
+    if($('wifiPass').value!==$('wifiPassConfirm').value)throw Error('两次输入的 Wi-Fi 密码不一致');
+    const data=await api('/device/wifi','PUT',{
+      wifi_ssid:$('wifiName').value,wifi_password:$('wifiPass').value
+    });
+    networkSaved(data);
+  }catch(e){notice(e.message)}
+};
+$('logoutBtn').onclick=async()=>{
+  try{await api('/auth/logout','POST')}catch(e){}
+  token='';clearInterval(poller);show('dashboard',false);show('login',true);
+  notice('已退出登录；未完成作业将在租约到期后释放');
+};
+$('refreshBtn').onclick=status;
+$('cancelBtn').onclick=async()=>{
+  if(!sessionId)return;
+  try{await api('/print-sessions/'+sessionId,'DELETE');notice('取消请求已提交；正在发送的页面会先完成')}catch(e){notice(e.message)}
+  status();
+};
+$('printBtn').onclick=async()=>{
+  const file=$('file').files[0];if(!file)return;
+  uploading=true;$('printBtn').disabled=true;notice('正在准备上传…');
+  try{
+    if(!sessionId){
+      const total=Number($('totalPages').value);
+      if(!Number.isInteger(total)||total<1||total>999)throw Error('总页数必须为 1～999');
+      const created=await api('/print-sessions','POST',{job_id:$('jobId').value,total_pages:total});
+      sessionId=created.session_id;lastHeartbeat=Date.now();
+    }
+    const pageNumber=Number($('pageNumber').textContent);
+    let sha='';
+    if(globalThis.crypto&&crypto.subtle){
+      const digest=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());
+      sha=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+    }
+    const request=new XMLHttpRequest();
+    request.open('POST','/api/v1/print-sessions/'+sessionId+'/pages/'+pageNumber);
+    request.setRequestHeader('Authorization','Bearer '+token);
+    if(sha)request.setRequestHeader('X-Page-SHA256',sha);
+    request.setRequestHeader('Content-Type','application/octet-stream');
+    request.upload.onprogress=e=>{
+      if(e.lengthComputable){
+        $('progress').value=Math.round(e.loaded/e.total*100);
+        $('printState').textContent='上传中 '+$('progress').value+'%';
+      }
+    };
+    request.onload=()=>{
+      uploading=false;
+      try{
+        const result=JSON.parse(request.responseText);
+        if(request.status!==202||!result.ok)throw Error(result.error?.message||'上传失败');
+        $('file').value='';$('size').textContent='—';
+        notice('第 '+pageNumber+' 页已排队发送；等待 USB 完成后选择下一页');
+      }catch(e){notice(e.message)}
+      status();
+    };
+    request.onerror=()=>{uploading=false;notice('网络中断，请先查询会话状态，勿直接重发');status()};
+    request.send(file);
+  }catch(e){uploading=false;notice(e.message);status()}
+};
+</script></body></html>

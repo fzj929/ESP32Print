@@ -1,4 +1,5 @@
 dependencies:
+  espressif/cjson: "^1.7.19"
   espressif/usb:
     version: "^1.0.0"
     rules:

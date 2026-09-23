@@ -1,5 +1,6 @@
 # ESP-IDF generated files
 **/build/
+**/build_*/
 **/managed_components/
 **/sdkconfig
 **/sdkconfig.old

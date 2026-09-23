@@ -1,0 +1,2 @@
+# Safety-only configuration, NOT a complete production security profile.
+CONFIG_BIPS_DEVELOPMENT_MODE=n

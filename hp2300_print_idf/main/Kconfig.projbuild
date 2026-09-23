@@ -1,0 +1,13 @@
+menu "mybips printer gateway"
+
+    config BIPS_DEVELOPMENT_MODE
+        bool "Enable unprovisioned printer testing and development-only password recovery"
+        default n
+        help
+            This mode permits manual printing without a provisioned eFuse identity
+            and permits GPIO4 to restore the shared initial password. It is unsafe
+            for production. Disable it in a production configuration; printing
+            then fails closed until the certificate-bound identity and recovery
+            flow are implemented and verified.
+
+endmenu
